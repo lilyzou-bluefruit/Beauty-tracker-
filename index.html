@@ -1,1 +1,518 @@
+<!DOCTYPE html>
 
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Beauty Tracker ✦</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --cream: #fdf6f0; --peach: #fce8d8; --terracotta: #c45e2e;
+    --brown: #2d1a0e; --mid: #9b6b4a; --soft: #edd9c8;
+    --card: rgba(255,255,255,0.78);
+    --urgent: #fee2e2; --urgent-text: #b91c1c;
+    --soon: #fef3c7; --soon-text: #b45309;
+    --ok: #d1fae5; --ok-text: #065f46;
+    --purple: #6d28d9;
+    --stock-bg: #f0f4ff; --stock-text: #3730a3;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: linear-gradient(135deg, #fdf6f0 0%, #fce8d8 55%, #f5d4c2 100%); min-height: 100vh; color: var(--brown); }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background: radial-gradient(ellipse 60% 40% at 80% 20%, rgba(196,94,46,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 10% 80%, rgba(109,40,217,0.04) 0%, transparent 70%); }
+  .wrap { max-width: 740px; margin: 0 auto; padding: 28px 16px 60px; position: relative; z-index: 1; }
+
+.header { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:24px; }
+.header-left .eyebrow { font-size:10px; letter-spacing:3px; color:#c49070; text-transform:uppercase; margin-bottom:5px; }
+.header-left h1 { font-family:‘Cormorant Garamond’,serif; font-size:clamp(26px,6vw,38px); font-weight:700; letter-spacing:-0.5px; line-height:1; }
+.header-left .sub { font-size:13px; color:var(–mid); margin-top:5px; font-style:italic; font-family:‘Cormorant Garamond’,serif; }
+.btn-add { background:var(–terracotta); color:#fff; border:none; border-radius:13px; padding:12px 24px; font-family:‘DM Sans’,sans-serif; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 4px 18px rgba(196,94,46,0.35); transition:transform 0.15s,box-shadow 0.15s; }
+.btn-add:hover { transform:translateY(-2px); box-shadow:0 7px 24px rgba(196,94,46,0.45); }
+
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-bottom:14px; }
+.stat-card { background:var(–card); border-radius:14px; padding:14px 16px; border:1px solid rgba(196,94,46,0.13); backdrop-filter:blur(10px); animation:fadeUp 0.4s ease both; }
+.stat-icon { font-size:17px; margin-bottom:3px; }
+.stat-value { font-family:‘Cormorant Garamond’,serif; font-size:28px; font-weight:700; line-height:1; }
+.stat-label { font-size:10px; color:var(–mid); text-transform:uppercase; letter-spacing:0.6px; margin-top:3px; }
+
+.budget-banner { background:linear-gradient(135deg,#2d1a0e,#5a3320); border-radius:16px; padding:18px 22px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; animation:fadeUp 0.4s ease 0.15s both; }
+.b-label { font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.55); margin-bottom:4px; }
+.b-value { font-family:‘Cormorant Garamond’,serif; font-size:32px; font-weight:700; color:#fff; line-height:1; }
+.b-sub { font-size:12px; color:rgba(255,255,255,0.5); margin-top:3px; }
+.budget-parts { display:flex; gap:20px; flex-wrap:wrap; }
+.budget-part .bp-label { font-size:10px; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:2px; text-align:right; }
+.budget-part .bp-val { font-size:17px; font-weight:600; color:rgba(255,255,255,0.85); text-align:right; }
+
+.toolbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
+.filters { display:flex; gap:6px; flex-wrap:wrap; }
+.filter-btn { padding:6px 14px; border-radius:99px; font-size:12px; font-family:‘DM Sans’,sans-serif; font-weight:600; cursor:pointer; transition:all 0.2s; border:1.5px solid var(–soft); background:rgba(255,255,255,0.7); color:var(–mid); }
+.filter-btn.active { background:var(–terracotta); color:#fff; border-color:var(–terracotta); }
+select.sort-select { padding:7px 13px; border-radius:10px; border:1.5px solid var(–soft); background:rgba(255,255,255,0.7); font-family:‘DM Sans’,sans-serif; font-size:12px; color:var(–mid); cursor:pointer; outline:none; }
+
+.status-tabs { display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+.status-tab { padding:7px 16px; border-radius:99px; font-size:12px; font-family:‘DM Sans’,sans-serif; font-weight:600; cursor:pointer; border:1.5px solid var(–soft); background:rgba(255,255,255,0.7); color:var(–mid); transition:all 0.2s; }
+.status-tab.act-all { background:var(–brown); color:#fff; border-color:var(–brown); }
+.status-tab.act-stock { background:var(–stock-bg); color:var(–stock-text); border-color:#c7d2fe; }
+.status-tab.act-open { background:#ede9fe; color:var(–purple); border-color:#c4b5fd; }
+.status-tab.act-finished { background:#f1f5f9; color:#475569; border-color:#cbd5e1; }
+
+.product-list { display:flex; flex-direction:column; gap:12px; }
+.product-card { background:var(–card); border-radius:18px; padding:18px 20px; border:1.5px solid rgba(196,94,46,0.12); backdrop-filter:blur(10px); cursor:pointer; transition:all 0.25s; animation:fadeUp 0.4s ease both; }
+.product-card:hover { box-shadow:0 6px 24px rgba(196,94,46,0.12); transform:translateY(-1px); }
+.product-card.urgent { border-color:#fca5a5; background:rgba(255,245,244,0.9); }
+.product-card.stock-card { border-color:#c7d2fe; background:rgba(240,244,255,0.85); }
+.product-card.expanded { box-shadow:0 10px 36px rgba(196,94,46,0.16); }
+.card-top { display:flex; align-items:flex-start; gap:13px; }
+.card-icon { width:42px; height:42px; border-radius:13px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:20px; }
+.card-body { flex:1; min-width:0; }
+.card-title-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.card-name { font-weight:600; font-size:15px; }
+.badge { border-radius:99px; padding:2px 10px; font-size:11px; font-weight:700; letter-spacing:0.4px; white-space:nowrap; }
+.badge-urgent { background:var(–urgent); color:var(–urgent-text); }
+.badge-soon { background:var(–soon); color:var(–soon-text); }
+.badge-ok,.badge-open { background:#ede9fe; color:var(–purple); }
+.badge-finished { background:#f1f5f9; color:#64748b; }
+.badge-stock { background:var(–stock-bg); color:var(–stock-text); }
+.badge-open.is-urgent { background:var(–urgent); color:var(–urgent-text); }
+.card-meta { font-size:12px; color:#c49070; margin-top:3px; }
+.price-tag { font-size:12px; color:var(–mid); font-weight:500; }
+
+.progress-row { margin-top:11px; }
+.progress-labels { display:flex; justify-content:space-between; margin-bottom:5px; }
+.progress-labels span { font-size:11px; color:var(–mid); }
+.days-left { font-weight:600; }
+.days-left.red { color:var(–urgent-text); }
+.days-left.orange { color:var(–soon-text); }
+.progress-track { background:#f0ebe6; border-radius:99px; height:6px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:99px; transition:width 0.6s cubic-bezier(.4,0,.2,1); }
+
+.prediction-row { margin-top:9px; display:flex; gap:14px; flex-wrap:wrap; }
+.prediction-row span { font-size:12px; color:var(–mid); }
+.prediction-row strong { color:var(–brown); }
+
+.card-detail { margin-top:16px; padding-top:16px; border-top:1px solid var(–soft); }
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:13px; }
+.detail-cell { background:#fdf6f0; border-radius:9px; padding:9px 13px; }
+.detail-cell-label { font-size:10px; color:#c49070; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px; }
+.detail-cell-value { font-size:14px; font-weight:600; }
+.advice-box { border-radius:10px; padding:11px 14px; margin-bottom:13px; border:1px solid; }
+.advice-box.now { background:#fee2e2; border-color:#fca5a5; }
+.advice-box.wait { background:#d1fae5; border-color:#6ee7b7; }
+.advice-title { font-size:12px; font-weight:700; margin-bottom:3px; }
+.advice-text { font-size:13px; }
+.card-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.btn { padding:8px 16px; border-radius:9px; font-size:13px; font-family:‘DM Sans’,sans-serif; cursor:pointer; transition:all 0.15s; }
+.btn-edit { background:transparent; border:1.5px solid var(–soft); color:var(–mid); }
+.btn-edit:hover { border-color:var(–terracotta); color:var(–terracotta); }
+.btn-open { background:var(–stock-text); border:none; color:#fff; }
+.btn-open:hover { background:#312e81; }
+.btn-done { background:var(–purple); border:none; color:#fff; }
+.btn-done:hover { background:#5b21b6; }
+.btn-del { background:transparent; border:1.5px solid #fca5a5; color:var(–urgent-text); }
+.btn-del:hover { background:#fee2e2; }
+
+.empty { text-align:center; color:#c49070; padding:50px 20px; font-style:italic; font-family:‘Cormorant Garamond’,serif; font-size:18px; }
+
+.overlay { position:fixed; inset:0; background:rgba(20,10,5,0.45); z-index:100; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(5px); padding:16px; opacity:0; transition:opacity 0.2s; pointer-events:none; overflow-y:auto; }
+.overlay.visible { opacity:1; pointer-events:all; }
+.modal { background:#fffaf7; border-radius:22px; padding:28px 24px; max-width:480px; width:100%; box-shadow:0 24px 64px rgba(0,0,0,0.2); border:1px solid var(–soft); transform:translateY(16px); transition:transform 0.25s; max-height:90vh; overflow-y:auto; }
+.overlay.visible .modal { transform:translateY(0); }
+.modal h2 { font-family:‘Cormorant Garamond’,serif; font-size:24px; font-weight:700; margin-bottom:20px; }
+.field { margin-bottom:13px; }
+.field label { display:block; font-size:11px; font-weight:600; color:var(–mid); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; }
+.field input,.field select { width:100%; padding:10px 14px; border-radius:11px; border:1.5px solid var(–soft); background:#fffdf9; font-family:‘DM Sans’,sans-serif; font-size:14px; color:var(–brown); outline:none; transition:border-color 0.2s; }
+.field input:focus,.field select:focus { border-color:var(–terracotta); }
+.field-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+.status-selector { display:flex; gap:8px; flex-wrap:wrap; }
+.status-opt { padding:8px 14px; border-radius:10px; border:1.5px solid var(–soft); background:rgba(255,255,255,0.7); font-size:13px; font-family:‘DM Sans’,sans-serif; cursor:pointer; transition:all 0.15s; color:var(–mid); }
+.status-opt.sel-stock { background:var(–stock-bg); color:var(–stock-text); border-color:#c7d2fe; font-weight:700; }
+.status-opt.sel-open { background:#ede9fe; color:var(–purple); border-color:#c4b5fd; font-weight:700; }
+.status-opt.sel-finished { background:#f1f5f9; color:#475569; border-color:#cbd5e1; font-weight:700; }
+
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+.btn-cancel { background:transparent; border:1.5px solid var(–soft); color:var(–mid); padding:10px 20px; border-radius:11px; font-size:14px; font-family:‘DM Sans’,sans-serif; cursor:pointer; }
+.btn-save { background:var(–terracotta); color:#fff; border:none; padding:10px 22px; border-radius:11px; font-size:14px; font-weight:600; font-family:‘DM Sans’,sans-serif; cursor:pointer; }
+.btn-save:hover { background:#a84d22; }
+
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(–brown); color:#fff; padding:11px 22px; border-radius:99px; font-size:13px; font-family:‘DM Sans’,sans-serif; z-index:200; transition:transform 0.3s cubic-bezier(.4,0,.2,1); white-space:nowrap; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="header-left">
+      <div class="eyebrow">Mon espace beauté</div>
+      <h1>Beauty Tracker ✦</h1>
+      <div class="sub">Suivi intelligent & prévisions shopping</div>
+    </div>
+    <button class="btn-add" onclick="openModal()">+ Ajouter</button>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="budget-banner" id="budget"></div>
+  <div class="toolbar">
+    <div class="filters" id="filters"></div>
+    <select class="sort-select" id="sortSelect" onchange="render()">
+      <option value="urgency">Trier : Urgence</option>
+      <option value="name">Trier : Nom A→Z</option>
+      <option value="price">Trier : Prix ↓</option>
+    </select>
+  </div>
+  <div class="status-tabs" id="statusTabs"></div>
+  <div class="product-list" id="list"></div>
+</div>
+
+<div class="overlay" id="overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <h2 id="modalTitle">Nouveau produit</h2>
+    <input type="hidden" id="editId"/>
+    <div class="field">
+      <label>Statut *</label>
+      <div class="status-selector" id="statusSelector">
+        <div class="status-opt" data-val="stock" onclick="selectStatus('stock')">🗄 En stock</div>
+        <div class="status-opt" data-val="open" onclick="selectStatus('open')">🟣 En cours</div>
+        <div class="status-opt" data-val="finished" onclick="selectStatus('finished')">✅ Terminé</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Nom du produit *</label>
+      <input type="text" id="fName" placeholder="ex: Crème Clinique Moisture Surge…"/>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Catégorie</label>
+        <select id="fCategory">
+          <option>Visage</option><option>Corps</option><option>Cheveux</option>
+          <option>Maquillage</option><option>Parfum</option><option>Solaire</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Prix (€)</label>
+        <input type="number" id="fPrice" placeholder="0" min="0" step="0.01"/>
+      </div>
+    </div>
+    <div class="field-row" id="dateFields">
+      <div class="field">
+        <label>Date d'ouverture</label>
+        <input type="date" id="fOpened"/>
+      </div>
+      <div class="field">
+        <label>Date terminé</label>
+        <input type="date" id="fEmpty"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>Quantité</label>
+      <input type="number" id="fQty" placeholder="1" min="1" value="1"/>
+    </div>
+    <div class="field">
+      <label>Notes (format, contenance…)</label>
+      <input type="text" id="fNotes" placeholder="ex: 50ml, format voyage…"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+      <button class="btn-save" onclick="saveProduct()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const CATEGORIES=["Tous","Visage","Corps","Cheveux","Maquillage","Parfum","Solaire"];
+const CAT_ICONS={Visage:"🧴",Corps:"🫧",Cheveux:"💆",Maquillage:"💄",Parfum:"✨",Solaire:"☀️"};
+const SALE_SEASONS=[
+  {name:"Soldes Hiver",months:[1,2],label:"Jan–Fév"},
+  {name:"Soldes Été",months:[7,8],label:"Juil–Août"},
+  {name:"Black Friday",months:[11],label:"Novembre"},
+  {name:"Fêtes",months:[12],label:"Décembre"},
+];
+
+let products=[], activeFilter="Tous", activeStatusFilter="all", expandedId=null, selectedStatus="open";
+
+function load(){
+  try{products=JSON.parse(localStorage.getItem("beautytracker_v3")||"[]");}catch(e){products=[];}
+  if(!products.length){
+    products=[
+      {id:1,name:"Crème hydratante Clinique",category:"Visage",statusMode:"finished",openedDate:"2025-01-10",emptyDate:"2025-03-15",price:42,qty:1,notes:"50ml"},
+      {id:2,name:"Shampoing Kérastase",category:"Cheveux",statusMode:"open",openedDate:"2025-02-01",emptyDate:null,price:28,qty:1,notes:"250ml"},
+      {id:3,name:"Sérum Vitamine C",category:"Visage",statusMode:"finished",openedDate:"2024-11-20",emptyDate:"2025-02-10",price:55,qty:1,notes:"30ml"},
+      {id:4,name:"Huile de nuit Nuxe",category:"Visage",statusMode:"stock",openedDate:null,emptyDate:null,price:34,qty:2,notes:"30ml"},
+      {id:5,name:"Masque capillaire L'Oréal",category:"Cheveux",statusMode:"stock",openedDate:null,emptyDate:null,price:12,qty:1,notes:"300ml"},
+    ];
+    save();
+  }
+}
+function save(){localStorage.setItem("beautytracker_v3",JSON.stringify(products));}
+function today(){return new Date().toISOString().split("T")[0];}
+function daysBetween(d1,d2){return Math.round((new Date(d2)-new Date(d1))/86400000);}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x.toISOString().split("T")[0];}
+function fmtDate(d){if(!d)return"—";return new Date(d+"T12:00:00").toLocaleDateString("fr-FR",{day:"numeric",month:"short",year:"numeric"});}
+function fmtEur(n){return n.toLocaleString("fr-FR",{minimumFractionDigits:0,maximumFractionDigits:0})+"€";}
+
+function getNextSale(targetDate){
+  const d=new Date(targetDate),year=d.getFullYear();
+  let best=null,minDiff=Infinity;
+  for(let y=year;y<=year+1;y++) for(const s of SALE_SEASONS) for(const m of s.months){
+    const sd=new Date(y,m-1,1),diff=Math.round((sd-d)/86400000);
+    if(diff>=-30&&diff<minDiff){minDiff=diff;best={...s,daysAway:diff};}
+  }
+  return best;
+}
+
+function enrich(p){
+  const t=today();
+  const mode=p.statusMode||(p.emptyDate?"finished":p.openedDate?"open":"stock");
+  const dur=(p.openedDate&&p.emptyDate)?daysBetween(p.openedDate,p.emptyDate):null;
+  const daysSince=p.openedDate?daysBetween(p.openedDate,t):0;
+  const pct=dur?Math.min(100,Math.round(daysSince/dur*100)):null;
+  const predictedEmpty=(dur&&p.openedDate&&!p.emptyDate)?addDays(p.openedDate,dur):null;
+  const daysLeft=predictedEmpty?daysBetween(t,predictedEmpty):null;
+  const peers=products.filter(x=>x.id!==p.id&&x.category===p.category&&x.openedDate&&x.emptyDate);
+  const avgCat=peers.length?Math.round(peers.reduce((s,x)=>s+daysBetween(x.openedDate,x.emptyDate),0)/peers.length):null;
+  let status="ok";
+  if(mode==="stock")status="stock";
+  else if(mode==="finished")status="finished";
+  else if(daysLeft!==null){if(daysLeft<14)status="urgent";else if(daysLeft<30)status="soon";else status="open";}
+  else status="open";
+  const saleSeason=predictedEmpty?getNextSale(addDays(predictedEmpty,-14)):null;
+  return{...p,mode,dur,daysSince,pct,predictedEmpty,daysLeft,status,saleSeason,avgCat};
+}
+
+function getFiltered(){
+  let list=products.map(enrich);
+  if(activeFilter!=="Tous")list=list.filter(p=>p.category===activeFilter);
+  if(activeStatusFilter!=="all")list=list.filter(p=>p.mode===activeStatusFilter);
+  const sort=document.getElementById("sortSelect")?.value||"urgency";
+  if(sort==="urgency"){const ord={urgent:0,soon:1,open:2,ok:3,stock:4,finished:5};list.sort((a,b)=>(ord[a.status]??6)-(ord[b.status]??6));}
+  else if(sort==="name")list.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(sort==="price")list.sort((a,b)=>(b.price||0)-(a.price||0));
+  return list;
+}
+
+function renderStats(){
+  const all=products.map(enrich);
+  const data=[
+    {icon:"🗄",value:all.filter(p=>p.mode==="stock").length,label:"En stock",color:"var(--stock-text)"},
+    {icon:"✦",value:all.filter(p=>p.mode==="open").length,label:"En cours",color:"var(--purple)"},
+    {icon:"⚠",value:all.filter(p=>p.status==="urgent").length,label:"Urgents",color:"var(--urgent-text)"},
+    {icon:"◎",value:all.filter(p=>p.status==="soon").length,label:"Bientôt vides",color:"var(--soon-text)"},
+  ];
+  document.getElementById("stats").innerHTML=data.map((s,i)=>`
+    <div class="stat-card" style="animation-delay:${i*0.06}s">
+      <div class="stat-icon">${s.icon}</div>
+      <div class="stat-value" style="color:${s.color}">${s.value}</div>
+      <div class="stat-label">${s.label}</div>
+    </div>`).join("");
+}
+
+function renderBudget(){
+  const all=products.map(enrich);
+  const spent=all.filter(p=>p.mode==="finished").reduce((s,p)=>s+(p.price||0),0);
+  const stockVal=all.filter(p=>p.mode==="stock").reduce((s,p)=>s+(p.price||0)*(p.qty||1),0);
+  const openVal=all.filter(p=>p.mode==="open").reduce((s,p)=>s+(p.price||0),0);
+  document.getElementById("budget").innerHTML=`
+    <div>
+      <div class="b-label">Budget total investi</div>
+      <div class="b-value">${fmtEur(spent+stockVal+openVal)}</div>
+      <div class="b-sub">${products.length} produits au total</div>
+    </div>
+    <div class="budget-parts">
+      <div class="budget-part"><div class="bp-label">Dépensé</div><div class="bp-val">${fmtEur(spent)}</div></div>
+      <div class="budget-part"><div class="bp-label">En stock</div><div class="bp-val">${fmtEur(stockVal)}</div></div>
+      <div class="budget-part"><div class="bp-label">En cours</div><div class="bp-val">${fmtEur(openVal)}</div></div>
+    </div>`;
+}
+
+function renderFilters(){
+  document.getElementById("filters").innerHTML=CATEGORIES.map(c=>`
+    <button class="filter-btn${c===activeFilter?" active":""}" onclick="setFilter('${c}')">${c}</button>`).join("");
+}
+
+function renderStatusTabs(){
+  const all=products.map(enrich);
+  const counts={all:all.length,stock:all.filter(p=>p.mode==="stock").length,open:all.filter(p=>p.mode==="open").length,finished:all.filter(p=>p.mode==="finished").length};
+  const tabs=[
+    {val:"all",label:`Tous (${counts.all})`,cls:"act-all"},
+    {val:"stock",label:`🗄 Stock (${counts.stock})`,cls:"act-stock"},
+    {val:"open",label:`🟣 En cours (${counts.open})`,cls:"act-open"},
+    {val:"finished",label:`✅ Terminés (${counts.finished})`,cls:"act-finished"},
+  ];
+  document.getElementById("statusTabs").innerHTML=tabs.map(t=>`
+    <button class="status-tab${activeStatusFilter===t.val?" "+t.cls:""}" onclick="setStatusFilter('${t.val}')">${t.label}</button>`).join("");
+}
+
+function badgeHtml(status){
+  const map={urgent:"Urgent",soon:"Bientôt",ok:"En cours",open:"En cours",finished:"Terminé",stock:"En stock"};
+  return`<span class="badge badge-${status}">${map[status]||status}</span>`;
+}
+function progressColor(pct){if(pct>85)return"#ef4444";if(pct>65)return"#f59e0b";return"#8b5cf6";}
+
+function renderList(){
+  const list=getFiltered();
+  const el=document.getElementById("list");
+  if(!list.length){el.innerHTML=`<div class="empty">Aucun produit ici — clique sur + Ajouter ✦</div>`;return;}
+  el.innerHTML=list.map((p,i)=>{
+    const isExp=expandedId===p.id, isStock=p.mode==="stock";
+    const iconBg=isStock?"var(--stock-bg)":p.status==="urgent"?"var(--urgent)":p.status==="soon"?"var(--soon)":p.status==="finished"?"#f1f5f9":"#ede9fe";
+    const icon=CAT_ICONS[p.category]||"✦";
+    let progress="";
+    if(!isStock&&!p.emptyDate&&p.pct!==null){
+      const dlClass=p.daysLeft<14?"red":p.daysLeft<30?"orange":"";
+      const dlText=p.daysLeft>0?`~${p.daysLeft}j restants`:"⚠ vide !";
+      progress=`<div class="progress-row">
+        <div class="progress-labels"><span>Consommé : ${p.pct}%</span>${p.daysLeft!==null?`<span class="days-left ${dlClass}">${dlText}</span>`:""}</div>
+        <div class="progress-track"><div class="progress-fill" style="width:${p.pct}%;background:${progressColor(p.pct)}"></div></div>
+      </div>`;
+    }
+    let pred="";
+    if(!isStock&&!p.emptyDate&&p.predictedEmpty){
+      let sh="";
+      if(p.saleSeason){const sc=p.saleSeason.daysAway<=0?"var(--urgent-text)":"var(--ok-text)";const st=p.saleSeason.daysAway<=0?`🛍 ${p.saleSeason.name} — <strong>maintenant !</strong>`:`🛍 ${p.saleSeason.name} dans ${p.saleSeason.daysAway}j`;sh=`<span style="color:${sc}">${st}</span>`;}
+      pred=`<div class="prediction-row"><span>🗓 Fin estimée : <strong>${fmtDate(p.predictedEmpty)}</strong></span>${sh}</div>`;
+    }
+    let stockInfo=isStock&&p.qty>1?`<div style="margin-top:6px;font-size:12px;color:var(--stock-text);font-weight:600">📦 ${p.qty} unités en stock</div>`:"";
+    let detail="";
+    if(isExp){
+      let advice="";
+      if(!isStock&&!p.emptyDate&&p.saleSeason){
+        const cls=p.saleSeason.daysAway<=0?"now":"wait";
+        const atitle=p.saleSeason.daysAway<=0?"💡 C'est le moment d'acheter !":"💡 Conseil shopping";
+        const atxt=p.saleSeason.daysAway<=0?`Les ${p.saleSeason.name} sont en cours — commande maintenant !`:`Les ${p.saleSeason.name} (${p.saleSeason.label}) arrivent dans ${p.saleSeason.daysAway} jours. Attends pour acheter "${p.name}" à prix réduit.`;
+        advice=`<div class="advice-box ${cls}"><div class="advice-title" style="color:${cls==="now"?"var(--urgent-text)":"var(--ok-text)"}">${atitle}</div><div class="advice-text">${atxt}</div></div>`;
+      }
+      detail=`<div class="card-detail">
+        <div class="detail-grid">
+          <div class="detail-cell"><div class="detail-cell-label">Statut</div><div class="detail-cell-value">${isStock?"🗄 En stock":p.emptyDate?"✅ Terminé":"🟣 En cours"}</div></div>
+          <div class="detail-cell"><div class="detail-cell-label">Quantité</div><div class="detail-cell-value">${p.qty||1} unité(s)</div></div>
+          <div class="detail-cell"><div class="detail-cell-label">Ouvert le</div><div class="detail-cell-value">${fmtDate(p.openedDate)}</div></div>
+          <div class="detail-cell"><div class="detail-cell-label">Durée réelle</div><div class="detail-cell-value">${p.dur?p.dur+" jours":"—"}</div></div>
+          <div class="detail-cell"><div class="detail-cell-label">Terminé le</div><div class="detail-cell-value">${fmtDate(p.emptyDate)}</div></div>
+          <div class="detail-cell"><div class="detail-cell-label">Moy. catégorie</div><div class="detail-cell-value">${p.avgCat?p.avgCat+" jours":"—"}</div></div>
+        </div>
+        ${advice}
+        <div class="card-actions">
+          <button class="btn btn-edit" onclick="event.stopPropagation();openEdit(${p.id})">✏️ Modifier</button>
+          ${isStock?`<button class="btn btn-open" onclick="event.stopPropagation();markOpen(${p.id})">📂 Ouvrir maintenant</button>`:""}
+          ${!isStock&&!p.emptyDate?`<button class="btn btn-done" onclick="event.stopPropagation();markEmpty(${p.id})">✓ Terminé</button>`:""}
+          <button class="btn btn-del" onclick="event.stopPropagation();deleteProduct(${p.id})">🗑 Supprimer</button>
+        </div>
+      </div>`;
+    }
+    return`<div class="product-card ${p.status==="urgent"?"urgent":""} ${isStock?"stock-card":""} ${isExp?"expanded":""}" style="animation-delay:${i*0.05}s" onclick="toggleExpand(${p.id})">
+      <div class="card-top">
+        <div class="card-icon" style="background:${iconBg}">${icon}</div>
+        <div class="card-body">
+          <div class="card-title-row">
+            <span class="card-name">${p.name}</span>
+            ${badgeHtml(p.status)}
+            ${p.price?`<span class="price-tag">${p.price}€</span>`:""}
+          </div>
+          <div class="card-meta">${p.category}${p.notes?" · "+p.notes:""}${(p.qty||1)>1?" · x"+(p.qty||1):""}</div>
+          ${progress}${pred}${stockInfo}
+        </div>
+      </div>
+      ${detail}
+    </div>`;
+  }).join("");
+}
+
+function render(){renderStats();renderBudget();renderFilters();renderStatusTabs();renderList();}
+function setFilter(f){activeFilter=f;render();}
+function setStatusFilter(f){activeStatusFilter=f;render();}
+function toggleExpand(id){expandedId=expandedId===id?null:id;renderList();}
+
+function selectStatus(val){
+  selectedStatus=val;
+  document.querySelectorAll(".status-opt").forEach(el=>{el.className="status-opt"+(el.dataset.val===val?" sel-"+val:"");});
+  document.getElementById("dateFields").style.display=val==="stock"?"none":"grid";
+}
+
+function openModal(id){
+  document.getElementById("editId").value=id||"";
+  document.getElementById("modalTitle").textContent=id?"Modifier le produit":"Nouveau produit";
+  if(id){
+    const p=products.find(x=>x.id===id);
+    if(p){
+      selectStatus(p.statusMode||"open");
+      document.getElementById("fName").value=p.name||"";
+      document.getElementById("fCategory").value=p.category||"Visage";
+      document.getElementById("fPrice").value=p.price||"";
+      document.getElementById("fOpened").value=p.openedDate||"";
+      document.getElementById("fEmpty").value=p.emptyDate||"";
+      document.getElementById("fQty").value=p.qty||1;
+      document.getElementById("fNotes").value=p.notes||"";
+    }
+  } else {
+    selectStatus("open");
+    document.getElementById("fName").value="";
+    document.getElementById("fCategory").value="Visage";
+    document.getElementById("fPrice").value="";
+    document.getElementById("fOpened").value=today();
+    document.getElementById("fEmpty").value="";
+    document.getElementById("fQty").value=1;
+    document.getElementById("fNotes").value="";
+  }
+  document.getElementById("overlay").classList.add("visible");
+}
+function openEdit(id){openModal(id);}
+function closeModal(){document.getElementById("overlay").classList.remove("visible");}
+function handleOverlayClick(e){if(e.target===document.getElementById("overlay"))closeModal();}
+
+function saveProduct(){
+  const name=document.getElementById("fName").value.trim();
+  if(!name){document.getElementById("fName").focus();return;}
+  const id=document.getElementById("editId").value;
+  const data={
+    name, statusMode:selectedStatus,
+    category:document.getElementById("fCategory").value,
+    price:parseFloat(document.getElementById("fPrice").value)||0,
+    openedDate:selectedStatus==="stock"?null:(document.getElementById("fOpened").value||null),
+    emptyDate:selectedStatus==="finished"?(document.getElementById("fEmpty").value||today()):null,
+    qty:parseInt(document.getElementById("fQty").value)||1,
+    notes:document.getElementById("fNotes").value.trim(),
+  };
+  if(id){products=products.map(p=>p.id==id?{...p,...data}:p);showToast("Produit modifié ✓");}
+  else{products.push({...data,id:Date.now()});showToast("Produit ajouté ✓");}
+  save();closeModal();render();
+}
+
+function markEmpty(id){
+  products=products.map(p=>p.id===id?{...p,statusMode:"finished",emptyDate:today()}:p);
+  save();expandedId=null;render();showToast("Produit marqué terminé ✓");
+}
+
+function markOpen(id){
+  const p=products.find(x=>x.id===id);
+  if(!p)return;
+  const newQty=(p.qty||1)-1;
+  if(newQty>0){
+    // Réduire le stock et créer un nouveau produit "en cours"
+    products=products.map(x=>x.id===id?{...x,qty:newQty}:x);
+    products.push({...p,id:Date.now(),statusMode:"open",openedDate:today(),emptyDate:null,qty:1});
+  } else {
+    products=products.map(x=>x.id===id?{...x,statusMode:"open",openedDate:today(),emptyDate:null,qty:1}:x);
+  }
+  save();expandedId=null;render();showToast("Produit ouvert ! 🟣");
+}
+
+function deleteProduct(id){
+  if(!confirm("Supprimer ce produit ?"))return;
+  products=products.filter(p=>p.id!==id);
+  save();expandedId=null;render();showToast("Produit supprimé");
+}
+
+function showToast(msg){
+  const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2500);
+}
+
+load();render();
+</script>
+
+</body>
+</html>
